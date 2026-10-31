@@ -1,0 +1,20 @@
+[package]
+name = "rmcp_example"
+version.workspace = true
+edition.workspace = true
+publish = false
+default-run = "rmcp_example"
+
+[lints]
+workspace = true
+
+[dependencies]
+rig = { workspace = true, features = ["rmcp"] }
+anyhow = { workspace = true }
+axum = { workspace = true }
+rmcp = { workspace = true, features = ["client", "macros", "reqwest", "transport-streamable-http-client-reqwest", "transport-streamable-http-server"] }
+schemars = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
