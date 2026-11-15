@@ -169,6 +169,13 @@ fn input(
                         UserContent::Text(text) => json!({"type": "input_text", "text": text.text}),
                         // A function output has no error field: a failed
                         // result says so in its text.
+                        UserContent::NamedToolOutput(result) => {
+                            if target.provider.dialect.name != "chatgpt" {
+                                return Err(unsendable("named tool output without a call ID"));
+                            }
+                            items.push(json!({"type":"function_call_output", "name":result.name.as_str(), "output":result.output}));
+                            continue;
+                        }
                         UserContent::ToolResult(result) => {
                             let call_id = ids.spell(&result.call);
                             let output = result_output(&result.content)?;

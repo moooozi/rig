@@ -406,6 +406,11 @@ fn message_json(
 /// rejects.
 fn user_part(part: &UserContent, ids: &WireIds) -> Result<Option<Value>, EncodeError> {
     Ok(Some(match part {
+        UserContent::NamedToolOutput(_) => {
+            return Err(EncodeError::request(
+                "named observations are not supported by Anthropic",
+            ));
+        }
         UserContent::Text(part) if part.text.trim().is_empty() => return Ok(None),
         UserContent::Text(part) => text(&part.text),
         UserContent::ToolResult(result) => {

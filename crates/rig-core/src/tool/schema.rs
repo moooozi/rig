@@ -25,7 +25,7 @@ use schemars::{JsonSchema, Schema};
 use serde_json::Value;
 
 /// The JSON schema of the arguments type `A`, in the plain shape tool
-/// definitions use: inline, without `$schema`, `title`, `default`, `format`
+/// definitions use: inline, without `$schema`, `title`, `format`
 /// (providers support it unevenly) or the type's own doc comment, and with
 /// `Option` fields optional, not nullable (no `null` type, enum value or
 /// `anyOf` alternative), and each object refusing keys
@@ -69,8 +69,12 @@ fn plain(schema: &mut Schema) {
         let paragraphs: Vec<String> = text.split("\n\n").map(|p| p.replace('\n', " ")).collect();
         *text = paragraphs.join("\n\n");
     }
-    for key in ["title", "default", "format"] {
+    for key in ["title", "format"] {
         remove_preserving_order(schema, key);
+    }
+    // Optional arguments omit null from their types; do not advertise a null default.
+    if schema.get("default") == Some(&Value::Null) {
+        remove_preserving_order(schema, "default");
     }
     if schema.contains_key("properties") && !schema.contains_key("additionalProperties") {
         schema.insert("additionalProperties".to_owned(), Value::Bool(false));

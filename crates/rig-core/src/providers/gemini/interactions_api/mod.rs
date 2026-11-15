@@ -665,6 +665,9 @@ fn result_content(content: &ToolResultContent) -> Result<Value, EncodeError> {
 /// context reads as prose.
 fn user_content(part: &UserContent) -> Result<Value, EncodeError> {
     match part {
+        UserContent::NamedToolOutput(_) => Err(EncodeError::request(
+            "named observations are not supported by Gemini",
+        )),
         UserContent::Text(text) => Ok(json!({ "type": "text", "text": text.text })),
         UserContent::Image(image) => media("image", image.media_type.clone(), &image.data),
         UserContent::Audio(audio) => media("audio", audio.media_type.clone(), &audio.data),
