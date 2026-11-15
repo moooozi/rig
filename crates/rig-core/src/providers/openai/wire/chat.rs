@@ -91,6 +91,7 @@ fn image_url(image: &crate::message::Image, user: bool) -> Result<Value, EncodeE
 fn user_part(part: &UserContent) -> Result<Value, EncodeError> {
     let file = |file: Value| object! {"type": "file", "file": file};
     Ok(match part {
+        UserContent::NamedToolOutput(_) => return Err(unsendable("named observation")),
         UserContent::Text(text) => json!({"type": "text", "text": text.text}),
         UserContent::Image(image) => image_url(image, true)?,
         UserContent::Document(document) => {

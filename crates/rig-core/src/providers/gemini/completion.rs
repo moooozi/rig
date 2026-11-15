@@ -723,6 +723,11 @@ pub(super) fn media(
 /// `parts`, in order.
 fn user_part(part: &UserContent, id: Option<&str>) -> Result<Value, EncodeError> {
     Ok(match part {
+        UserContent::NamedToolOutput(_) => {
+            return Err(EncodeError::request(
+                "named observations are not supported by Gemini",
+            ));
+        }
         UserContent::Text(text) => text_part(&text.text),
         UserContent::ToolResult(result) => {
             let (mut values, mut parts) = (Vec::new(), Vec::new());

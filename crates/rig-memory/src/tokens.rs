@@ -44,6 +44,13 @@ impl HeuristicTokenCounter {
     pub(crate) fn count_user(&self, content: &rig_core::message::UserContent) -> usize {
         use rig_core::message::UserContent;
         match content {
+            UserContent::NamedToolOutput(output) => self.bytes_to_tokens(
+                output
+                    .name
+                    .as_str()
+                    .len()
+                    .saturating_add(output.output.len()),
+            ),
             UserContent::Text(text) => self.bytes_to_tokens(text.text.len()),
             UserContent::ToolResult(result) => result
                 .content

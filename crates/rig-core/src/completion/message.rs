@@ -175,6 +175,8 @@ pub fn turn_failure(
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum UserContent {
+    /// A host observation carried as a named tool output, without a model-issued call.
+    NamedToolOutput(NamedToolOutput),
     /// Plain text user content.
     Text(Text),
     /// Result of a tool call returned as user-visible context to the model.
@@ -187,6 +189,16 @@ pub enum UserContent {
     Video(Video),
     /// Document content.
     Document(DocumentContent),
+}
+
+/// Runtime data with no preceding tool call. Only explicitly supporting providers
+/// may encode this item; it must never fall back to user or system text.
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct NamedToolOutput {
+    pub name: ToolName,
+    pub output: String,
+    /// Host delivery identity, persisted but not sent as a provider call ID.
+    pub event_id: String,
 }
 
 /// One block of an assistant turn: one provider output item.

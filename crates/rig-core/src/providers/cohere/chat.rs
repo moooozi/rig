@@ -348,6 +348,7 @@ fn document_value(position: usize, document: &Document) -> Value {
 /// text, or an image by URL. Replay leaves no other part.
 fn user_part(part: &UserContent) -> Result<Value, EncodeError> {
     Ok(match part {
+        UserContent::NamedToolOutput(_) => return Err(unsendable("named observation")),
         UserContent::Text(text) => json!({"type": "text", "text": text.text}),
         UserContent::Image(image) => {
             let mime = image.media_type.as_ref().map(MimeType::to_mime_type);

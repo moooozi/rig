@@ -184,6 +184,10 @@ impl Wire for Responses {
 }
 
 impl crate::completion::ReplayTarget for Responses {
+    fn named_tool_outputs(&self) -> bool {
+        self.provider.dialect.name == "chatgpt"
+    }
+
     /// Whether the catalog prices this dialect's replies
     /// ([`Quirks::catalog_priced`](crate::providers::openai::wire::Quirks::catalog_priced)).
     fn catalog_priced(&self) -> bool {

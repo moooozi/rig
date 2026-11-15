@@ -175,6 +175,12 @@ pub enum Media<'a> {
 /// The model a request is sent to, as replay sees it. Every completion wire
 /// implements it.
 pub trait ReplayTarget: std::fmt::Debug + WasmCompatSync {
+    /// Whether this transport preserves named tool outputs without call IDs.
+    /// Unsupported targets must reject them instead of changing their role.
+    fn named_tool_outputs(&self) -> bool {
+        false
+    }
+
     /// The wire format.
     fn api(&self) -> Api;
 
@@ -1631,6 +1637,10 @@ fn user<'a>(
                 result.content = result_images(result.content, form, &mut attached);
                 result.content = result_text_parts(result.content, parts, result.is_error);
                 shaped.push(Cow::Owned(UserContent::ToolResult(result)));
+                continue;
+            }
+            UserContent::NamedToolOutput(_) => {
+                shaped.push(Cow::Borrowed(part));
                 continue;
             }
             // Blank text says nothing, and several providers reject it.

@@ -263,6 +263,7 @@ impl<'a> UserParts<'a> {
             },
             UserContent::Audio(_) => return Err(unsendable("audio")),
             UserContent::Video(_) => return Err(unsendable("video")),
+            UserContent::NamedToolOutput(_) => return Err(unsendable("named observation")),
             UserContent::ToolResult(_) => return Err(unsendable("a tool result as user content")),
         }
         Ok(())

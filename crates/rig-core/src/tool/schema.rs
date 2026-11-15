@@ -25,8 +25,8 @@ use schemars::{JsonSchema, Schema};
 use serde_json::Value;
 
 /// The JSON schema of the arguments type `A`, in the plain shape tool
-/// definitions use: inline, without `$schema`, `title`, `default`, `format`
-/// (providers support it unevenly) or the type's own doc comment, with an
+/// definitions use: inline, without `$schema`, `title`, `format`
+/// (providers support them unevenly) or the type's own doc comment, with an
 /// `Option` property that is not `required` optional, not nullable (no
 /// `null` type, enum value or `anyOf` alternative; every other `null` stays,
 /// as in a `Vec<Option<T>>`'s items), and each object refusing keys
@@ -55,7 +55,7 @@ fn plain(schema: &mut Schema) {
         let paragraphs: Vec<String> = text.split("\n\n").map(|p| p.replace('\n', " ")).collect();
         *text = paragraphs.join("\n\n");
     }
-    for key in ["title", "default", "format"] {
+    for key in ["title", "format"] {
         remove_preserving_order(schema, key);
     }
     if schema.contains_key("properties") && !schema.contains_key("additionalProperties") {
@@ -91,6 +91,10 @@ fn omit_null(schema: &mut Value) {
                 schema.entry(key).or_insert(value);
             }
         }
+    }
+    // Optional arguments omit null from their types; do not advertise a null default.
+    if schema.get("default") == Some(&Value::Null) {
+        remove_preserving_order(schema, "default");
     }
     if let Some(Value::Array(types)) = schema.get_mut("type")
         && types.iter().any(|kind| kind == "null")

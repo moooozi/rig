@@ -314,6 +314,10 @@ pub const MOCK_API: crate::message::Api = crate::message::Api::from_static("mock
 pub const MOCK_MODEL: &str = "mock-model";
 
 impl crate::completion::ReplayTarget for MockScript {
+    fn named_tool_outputs(&self) -> bool {
+        true
+    }
+
     fn api(&self) -> crate::message::Api {
         MOCK_API
     }

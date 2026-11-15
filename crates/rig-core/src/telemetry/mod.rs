@@ -531,6 +531,10 @@ fn user_parts(content: &[UserContent]) -> Vec<TelemetryPart> {
     content
         .iter()
         .filter_map(|content| match content {
+            UserContent::NamedToolOutput(result) => Some(TelemetryPart::ToolCallResponse {
+                id: None,
+                response: serde_json::Value::String(result.output.clone()),
+            }),
             UserContent::Text(text) => Some(TelemetryPart::Text {
                 content: text.text.clone(),
             }),

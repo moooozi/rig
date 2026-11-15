@@ -117,6 +117,21 @@ impl Operation for Completion {
             .take()
             .filter(|model| !model.is_empty())
             .or_else(|| Some(target.model().to_owned()).filter(|model| !model.is_empty()));
+        let has_named_tool_outputs = request.chat_history.iter().any(|message| {
+            matches!(
+                &**message,
+                crate::message::Message::User { content }
+                    if content.iter().any(|part| matches!(
+                        part,
+                        crate::message::UserContent::NamedToolOutput(_)
+                    ))
+            )
+        });
+        if has_named_tool_outputs && !target.named_tool_outputs() {
+            return Err(ProviderError::request(
+                "named observations require the verified ChatGPT Responses transport",
+            ));
+        }
         // Every option the wire cannot honour is reported here, before
         // any wire encodes, whatever its encoder does.
         crate::completion::options::check(target, &mut request)?;
